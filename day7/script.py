@@ -16,20 +16,12 @@ with open('day7/in.txt') as f:
 					path.pop()
 				else:
 					path.append(line.removeprefix('$ cd '))
-				pass
-			elif line.startswith('$ ls'):
-				pass
-			else:
-				raise ValueError()
-		else:
-			if line.startswith('dir'):
-				pass
-			else:
-				size = int(line.split(' ')[0])
-				used_size += size
-				for i in range(0, len(path)):
-					key = ".".join(path[0:i+1])
-					sizes[key] += size
+		elif not line.startswith('dir'):
+			size = int(line.split(' ')[0])
+			used_size += size
+			for i in range(0, len(path)):
+				key = ".".join(path[0:i+1])
+				sizes[key] += size
 
 	p1 = 0
 	for path in sizes:
