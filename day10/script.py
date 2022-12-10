@@ -3,42 +3,39 @@ from collections import defaultdict
 with open('day10/in.txt') as f:
 	lines = [l.strip() for l in f.readlines()]
 	
-	c = 1
-	X = 1
+	cycle = 0
+	wait = 0
+	wait_v = None
+	x = 1
+	signals = 0
 
 	ROWS = 6
 	COLS = 40
-	D = [[' ' for _ in range(COLS)] for _ in range(ROWS)]
+	display = [[' ' for _ in range(COLS)] for _ in range(ROWS)]
 
-	C = [20, 60, 100, 140, 180, 220]
-	p1 = 0
+	while lines:
+		if cycle in [20, 60, 100, 140, 180, 220]:
+			signals += cycle * x
+		if abs(x - ((cycle-1) % COLS)) <= 1:
+			display[(cycle-1) // COLS][(cycle-1) % COLS] = '█'
 
-	for line in lines:
-		words = line.split(' ')
-		
-		if words[0] == 'noop':
-			if abs(X - ((c-1) % COLS)) <= 1:
-				D[(c-1) // COLS][(c-1) % COLS] = '█'
-			c += 1
-			if c in C:
-				p1 += c * X
-		elif words[0] == 'addx':
-			if abs(X - ((c-1) % COLS)) <= 1:
-				D[(c-1) // COLS][(c-1) % COLS] = '█'
-			c += 1
-			if c in C:
-				p1 += c * X
-			v = int(words[1])
-			if abs(X - ((c-1) % COLS)) <= 1:
-				D[(c-1) // COLS][(c-1) % COLS] = '█'
-			c += 1
-			X += v
-			if c in C:
-				p1 += c * X
-	print(p1)
-		
+		cycle += 1
+		if wait > 0:
+			wait -= 1
+		else:
+			if wait_v is not None:
+				x += wait_v
+				wait_v = None
+			line = lines[0].split(' ')
+			lines = lines[1:]
+			if line[0] == 'addx':
+				wait_v = int(line[1])
+				wait = 1
+	
+	print(signals)
+
 	print()
 	for r in range(ROWS):
 		for c in range(COLS):
-			print(D[r][c], end='')
+			print(display[r][c], end='')
 		print()
