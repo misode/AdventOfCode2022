@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-with open('day7/in.txt') as f:
+with open('day07/in.txt') as f:
 	lines = [l.strip() for l in f.readlines()]
 	path = []
 	used_size = 0

@@ -1,5 +1,5 @@
 
-with open('day3/in.txt') as f:
+with open('day03/in.txt') as f:
 	lines = [l.strip() for l in f.readlines()]
 	p1 = 0
 	p2 = 0

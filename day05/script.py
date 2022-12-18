@@ -1,6 +1,6 @@
 import re
 
-with open('day5/in.txt') as f:
+with open('day05/in.txt') as f:
 	lines = [l.strip() for l in f.readlines()]
 
 	# stacks = [

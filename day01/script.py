@@ -1,4 +1,4 @@
-with open('day1/in.txt') as f:
+with open('day01/in.txt') as f:
 	lines = [l.strip() for l in f.readlines()]
 
 	elves = []

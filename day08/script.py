@@ -1,5 +1,5 @@
 
-with open('day8/in.txt') as f:
+with open('day08/in.txt') as f:
 	lines = [l.strip() for l in f.readlines()]
 
 	G = [[int(c) for c in line] for line in lines]

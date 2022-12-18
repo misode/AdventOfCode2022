@@ -32,7 +32,7 @@ SCORE = {
 	"C": 3,
 }
 
-with open('day2/in.txt') as f:
+with open('day02/in.txt') as f:
 	lines = [l.strip() for l in f.readlines()]
 
 	score = 0

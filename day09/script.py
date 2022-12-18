@@ -26,7 +26,7 @@ def dbg(rope: list[Point]):
 		print()
 
 
-with open('day9/in.txt') as f:
+with open('day09/in.txt') as f:
 	lines = [l.strip() for l in f.readlines()]
 
 	for length in [2, 10]:
