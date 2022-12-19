@@ -1,3 +1,4 @@
+from collections import deque
 import re
 import time
 from dataclasses import dataclass
@@ -16,58 +17,65 @@ with open('day19/in.txt') as f:
 
   B: list[dict[str, dict[str, int]]] = []
 
-  for line in lines:
+  for line in lines[:3]:
     m = re.findall("Each ([a-z]+) robot costs ([^\.]*)\.", line)
     R: dict[str, dict[str, int]] = dict()
     for r, costs in m:
       R[r] = {k: int(cost) for cost, k in[i.split(' ') for i in costs.split(' and ')]}
     B.append(R)
 
-  SUM = 0
+  T = 32
+  ans = 1
 
   for id, blueprint in enumerate(B):
 
-    max_ingredient = {k: max([r.get(k, 0) for r in blueprint.values()]) for k in ITEMS if k != "geode"}
-
-    @lru_cache(maxsize=None)
-    def next_states(state: State) -> list[State]:
-      can_buy = []
-      for robot, recipe in blueprint.items():
-        if robot != "geode" and state.robots[ITEMS.index(robot)] > max_ingredient[robot]:
-          continue
-        if state.items[0] >= recipe.get("ore", 0) and state.items[1] >= recipe.get("clay", 0) and state.items[2] >= recipe.get("obsidian", 0):
-          can_buy.append(robot)
-      new_items = tuple([state.items[i]+state.robots[i] for i in range(4)])
-      for i, item in enumerate(ITEMS):
-        if new_items[i] > 40 and item in can_buy:
-          can_buy.remove(item)
-      if "geode" in can_buy:
-        new_states = []
-      else:
-        new_states = [State(new_items, state.robots)]
-      for bought in can_buy[-2:]:
-        new_states.append(State(
-          items=tuple([count - blueprint[bought].get(ITEMS[i], 0) for i, count in enumerate(new_items)]),
-          robots=tuple([state.robots[i] + (1 if item==bought else 0) for i, item in enumerate(ITEMS)]),
-        ))
-      return new_states
+    b_ore_ore = blueprint["ore"]["ore"]
+    b_clay_ore = blueprint["clay"]["ore"]
+    b_ob_ore = blueprint["obsidian"]["ore"]
+    b_ob_clay = blueprint["obsidian"]["clay"]
+    b_geode_ore = blueprint["geode"]["ore"]
+    b_geode_ob = blueprint["geode"]["obsidian"]
+    max_ore = max([b_ore_ore, b_clay_ore, b_ob_ore, b_geode_ore])
+    max_clay = b_ob_clay
+    max_ob = b_geode_ob
 
     t0 = time.perf_counter()
-    states = set([State((0,0,0,0), (1,0,0,0))])
-    print(f'=== {id+1} ========')
-    for m in range(24):
-      new_states: set[State] = set()
-      for s in states:
-        for n in next_states(s):
-          new_states.add(n)
-      states = new_states
-      if m > 15:
-        t2 = time.perf_counter()
-        print(m, len(states), f"{round(t2-t0)}s", next_states.cache_info())
+    geodes = 0
+    CACHE = set()
+    Q = deque([(0, 0, 0, 0, 0, 1, 0, 0, 0)])
+    while Q:
+      t, i1, i2, i3, i4, r1, r2, r3, r4 = Q.popleft()
+      if i4 > geodes:
+        geodes = i4
+      if t >= T:
+        continue
+      r1 = min(r1, max_ore)
+      r2 = min(r2, max_clay)
+      r3 = min(r3, max_ob)
 
-    M = max([(id+1) * s.items[-1] for s in states])
+      i1 = min(i1, (T-t)*max_ore-r1*(T-t-1))
+      i2 = min(i2, (T-t)*max_clay-r2*(T-t-1))
+      i3 = min(i3, (T-t)*max_ob-r3*(T-t-1))
+
+      u = t, i1, i2, i3, i4, r1, r2, r3, r4
+      if u in CACHE:
+        continue
+      CACHE.add(u)
+      if len(CACHE) % 100000 == 0:
+        print(t, geodes, len(CACHE), i1, i2, i3, i4, '|', r1, r2, r3, r4)
+
+      Q.append((t+1, i1+r1, i2+r2, i3+r3, i4+r4, r1, r2, r3, r4))
+      if i1 >= b_ore_ore:
+        Q.append((t+1, i1+r1-b_ore_ore, i2+r2, i3+r3, i4+r4, r1+1, r2, r3, r4))
+      if i1 >= b_clay_ore:
+        Q.append((t+1, i1+r1-b_clay_ore, i2+r2, i3+r3, i4+r4, r1, r2+1, r3, r4))
+      if i1 >= b_ob_ore and i2 >= b_ob_clay:
+        Q.append((t+1, i1+r1-b_ob_ore, i2+r2-b_ob_clay, i3+r3, i4+r4, r1, r2, r3+1, r4))
+      if i1 >= b_geode_ore and i3 >= b_geode_ob:
+        Q.append((t+1, i1+r1-b_geode_ore, i2+r2, i3+r3-b_geode_ob, i4+r4, r1, r2, r3, r4+1))
+
     t1 = time.perf_counter()
-    SUM += M
-    print(f"  quality={M} sum={SUM} time={round(t1-t0)}s")
+    print(f"==== {id+1}: {geodes} | {round(t1-t0)}s")
+    ans *= geodes
 
-  print('!!!!', SUM)
+  print("!!!!", ans)
