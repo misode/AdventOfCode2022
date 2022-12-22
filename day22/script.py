@@ -43,7 +43,7 @@ with open('day22/in.txt') as f:
         r = 199
       elif 0 <= r < 50 and c == 150 and dir == 0: # C -> F
         dir = 2
-        r = 50 - r + 100
+        r = 49 - r + 100
         c = 99
       elif 100 <= c < 150 and r == 50 and dir == 1: # D -> E
         dir = 2
@@ -55,7 +55,7 @@ with open('day22/in.txt') as f:
         r = 49
       elif 100 <= r < 150 and c == 100 and dir == 0: # F -> C
         dir = 2
-        r = 100 - r + 50
+        r = 99 - r + 50
         c = 149
       elif 50 <= c < 100 and r == 150 and dir == 1: # G -> H
         dir = 2
@@ -75,7 +75,7 @@ with open('day22/in.txt') as f:
         r = 0
       elif 100 <= r < 150 and c == -1 and dir == 2: # K -> N
         dir = 0
-        r = 150 - r
+        r = 149 - r
         c = 50
       elif 0 <= c < 50 and r == 99 and dir == 3: # L -> M
         dir = 0
@@ -87,7 +87,7 @@ with open('day22/in.txt') as f:
         r = 100
       elif 0 <= r < 50 and c == 49 and dir == 2: # N -> K
         dir = 0
-        r = 50 - r + 100
+        r = 49 - r + 100
         c = 0
       else:
         assert False, (r, c, dir)
@@ -113,8 +113,6 @@ with open('day22/in.txt') as f:
           assert G[tr][tc] != ' '
           if G[tr][tc] == '#':
             break
-          r = tr
-          c = tc
-          dir = tdir
+          r, c, dir = tr, tc, tdir
 
     print(1000 * (r+1) + 4 * (c+1) + dir)
